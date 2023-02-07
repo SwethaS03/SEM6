@@ -508,3 +508,80 @@ def printSteps(steps):
 steps, no_of_trips = a_star(s, g)
 printSteps(steps)
 print("No of trips : ", no_of_trips)
+
+
+//Hill climbing
+
+goal = [[0, 1, 2] , [3, 4, 5] , [6, 7, 8]]
+start  = [[1, 4, 2] , [3, 7, 5] , [6, 8, 0]]
+
+def getDistance(node,i,j):
+    for x in range(3):
+        for y in range(3):
+            if node == goal[i][j]:
+                return abs(x-i) + abs(y-j)
+    return 0
+
+
+def hMisplaced(state):
+    mis = 0
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] != goal[i][j] and (state[i][j] != 0 or goal[i][j] != 0):
+                mis += 1
+    return mis
+
+def hDistance(state):
+    dis = 0
+    for i in range(3):
+        for j in range(3):
+            dis += getDistance(state[i][j],i,j)
+    return dis
+
+def getZeroPosition(state):
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] == 0:
+                return i,j
+
+def validMove(i,j):
+    if i in range(3) and j in range(3):
+        return True
+    return False
+
+
+def getChildren(state):
+    possibleMoves = [[0,1],[1,0],[-1,0],[0,-1]]
+    children = []
+    i,j = getZeroPosition(state)
+    for move in possibleMoves:
+        if validMove(i+move[0],j+move[1]):
+            newState = [list(row) for row in state]
+            newState[i+move[0]][j+move[1]], newState[i][j] = newState[i][j], newState[i+move[0]][j+move[1]]
+            children.append(newState)
+    return children
+
+def printState(state):
+    for row in state:
+        print(*row)
+    print()
+
+def simpleHillClimbing(start):
+    state = start
+    print("Initial state: ")
+    printState(state)
+    while state!=goal:
+        prev = state
+        for i in getChildren(state):
+            if hMisplaced(i) <= hMisplaced(state):
+                state = i
+                break
+        printState(state)
+        if prev == state and state != goal:
+            return state,"local optimum reached"
+
+    
+    return state,"goal reached"
+goal,info = simpleHillClimbing(start)
+print(info)
+printState(goal)```
